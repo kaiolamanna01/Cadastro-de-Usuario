@@ -27,4 +27,7 @@ public class Usuario {
 
     @Column(name = "nome", nullable = false)
     private String nome;
+
+    @Column(name = "senha", nullable = false)
+    private String senha;
 }

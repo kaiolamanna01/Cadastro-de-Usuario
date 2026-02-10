@@ -25,8 +25,11 @@ public class UsuarioService {
     }
 
     public void deletarUsuario(String email) {
-        repository.deleteByEmail(email);
-    }
+    Usuario usuario = repository.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+    repository.delete(usuario);
+}
     
     public void atualizarUsuarioPorId(Integer id, Usuario usuario) {
         if (id == null) {
