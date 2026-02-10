@@ -1,5 +1,7 @@
 package com.kaiolamanna.cadastrar_usuario.business;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.kaiolamanna.cadastrar_usuario.infrastructure.entitys.Usuario;
@@ -28,7 +30,7 @@ public class UsuarioService {
     Usuario usuario = repository.findByEmail(email)
         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-    repository.delete(usuario);
+        repository.delete(usuario);
 }
     
     public void atualizarUsuarioPorId(Integer id, Usuario usuario) {
@@ -38,7 +40,12 @@ public class UsuarioService {
         Usuario usuarioExistente = repository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         usuarioExistente.setEmail(usuario.getEmail());
         usuarioExistente.setNome(usuario.getNome());
+        usuarioExistente.setSenha(usuario.getSenha());
         repository.saveAndFlush(usuarioExistente);
+    }
+
+    public List<Usuario> listarUsuarios() {
+        return repository.findAll();
     }
 
 }
