@@ -1,5 +1,6 @@
 package com.kaiolamanna.cadastrar_usuario.controller;
 
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,15 +23,14 @@ public class UsuarioController {
         private final UsuarioService service;
 
         @PostMapping
-        public ResponseEntity<Void> salvarUsuario(@RequestBody Usuario usuario) {
-                service.cadastrarUsuario(usuario);
-                return ResponseEntity.ok().build();
+        public ResponseEntity<Usuario> salvarUsuario(@RequestBody Usuario usuario) {
+                
+                return ResponseEntity.ok(service.cadastrarUsuario(usuario));
         }
 
         @GetMapping
         public ResponseEntity<Usuario> buscarUsuarioPorEmail(@RequestParam String email) {
-                Usuario usuario = service.buscarUsuarioPorEmail(email);
-                return ResponseEntity.ok(usuario);
+                return ResponseEntity.ok(service.buscarUsuarioPorEmail(email));
         }
 
         @DeleteMapping
@@ -43,5 +43,10 @@ public class UsuarioController {
         public ResponseEntity<Void> atualizarUsuarioPorId(@RequestBody Usuario usuario) {
                 service.atualizarUsuarioPorId(usuario.getId(), usuario);
                 return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/lista")
+        public ResponseEntity<List<Usuario>> listarUsuarios() {
+                return ResponseEntity.ok(service.listarUsuarios());
         }
 }
