@@ -48,4 +48,8 @@ public class UsuarioService {
         return repository.findAll();
     }
 
+    public List<Usuario> buscarPorNome(String nome) {
+        return repository.findByNomeContainingIgnoreCase(nome);
+}
+
 }
