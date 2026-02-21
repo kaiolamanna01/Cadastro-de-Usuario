@@ -66,102 +66,19 @@ function App() {
       </form>
 =======
 import { useState, useEffect, useCallback } from "react";
+import { globalStyles, theme } from "./styles/global";
+import { api } from "./services/usuarioApi";
+import Spinner from "./components/Spinner";
+import Toast from "./components/Toast";
+import UserRow from "./components/UserRow";
+import UserModal from "./components/UserModal";
+import DeleteConfirm from "./components/DeleteConfirm";
 
-const API_BASE = "http://localhost:8080/usuario";
-
-const theme = {
-  bg: "#0a0a0f",
-  surface: "#12121a",
-  surfaceHover: "#1a1a26",
-  border: "#1e1e2e",
-  accent: "#6c63ff",
-  accentHover: "#8a84ff",
-  accentGlow: "rgba(108, 99, 255, 0.3)",
-  success: "#22c55e",
-  danger: "#ef4444",
-  dangerHover: "#f87171",
-  text: "#e2e8f0",
-  textMuted: "#64748b",
-  textDim: "#94a3b8",
-};
-
-const globalStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: ${theme.bg};
-    color: ${theme.text};
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-16px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 ${theme.accentGlow}; }
-    50%       { box-shadow: 0 0 0 8px transparent; }
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  .fade-in { animation: fadeIn 0.35s ease both; }
-  .slide-in { animation: slideIn 0.3s ease both; }
-
-  input, select {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-  }
-
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: ${theme.bg}; }
-  ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 3px; }
-`;
-
-// ─── API helpers ────────────────────────────────────────────────
-async function apiFetch(url, options = {}) {
-  const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
-}
-
-const api = {
-  list:   ()           => apiFetch(`${API_BASE}/lista`),
-  get:    (email)      => apiFetch(`${API_BASE}?email=${encodeURIComponent(email)}`),
-  create: (data)       => apiFetch(API_BASE, { method: "POST", body: JSON.stringify(data) }),
-  update: (id, data)   => apiFetch(API_BASE, { method: "PUT", body: JSON.stringify({ ...data, id }) }),
-  delete: (email)      => apiFetch(`${API_BASE}?email=${encodeURIComponent(email)}`, { method: "DELETE" }),
-};
-
-// ─── Sub-components ─────────────────────────────────────────────
-
-function Spinner() {
-  return (
-    <div style={{
-      width: 18, height: 18,
-      border: `2px solid ${theme.border}`,
-      borderTopColor: theme.accent,
-      borderRadius: "50%",
-      animation: "spin 0.7s linear infinite",
-      display: "inline-block",
-    }} />
-  );
-}
-
-function Toast({ message, type, onDone }) {
+// Hook para detectar largura da tela
+function useWindowWidth() {
+  const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
+<<<<<<< HEAD
     const t = setTimeout(onDone, 3000);
     return () => clearTimeout(t);
   }, [onDone]);
@@ -439,20 +356,34 @@ function UserRow({ user, onEdit, onDelete, index }) {
 }
 
 // ─── Main App ────────────────────────────────────────────────────
+=======
+    const handle = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, []);
+  return width;
+}
+
+>>>>>>> 8ce9a59 (Adicionando busca no Backend)
 export default function App() {
-  const [users, setUsers]           = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [search, setSearch]         = useState("");
-  const [modal, setModal]           = useState(null); // null | { type: 'create' | 'edit', user? }
+  const [users, setUsers]            = useState([]);
+  const [loading, setLoading]        = useState(false);
+  const [search, setSearch]          = useState("");
+  const [modal, setModal]            = useState(null);
   const [deleteTarget, setDelTarget] = useState(null);
-  const [deleteLoading, setDelLoad] = useState(false);
-  const [toast, setToast]           = useState(null);
-  const [fetchError, setFetchError] = useState(false);
+  const [deleteLoading, setDelLoad]  = useState(false);
+  const [toast, setToast]            = useState(null);
+  const [fetchError, setFetchError]  = useState(false);
+
+  const width    = useWindowWidth();
+  const isMobile = width < 600;
+  const isTablet = width < 900;
 
   const showToast = (message, type = "success") => setToast({ message, type });
 
   const loadUsers = useCallback(async () => {
-    setLoading(true); setFetchError(false);
+    setLoading(true);
+    setFetchError(false);
     try {
       const data = await api.list();
       setUsers(data || []);
@@ -468,7 +399,7 @@ export default function App() {
   const handleSave = async () => {
     setModal(null);
     await loadUsers();
-    showToast(modal?.user?.id ? "Usuário atualizado com sucesso!" : "Usuário criado com sucesso!");
+    showToast(modal?.user ? "Usuário atualizado com sucesso!" : "Usuário criado com sucesso!");
   };
 
   const handleDeleteConfirm = async () => {
@@ -477,7 +408,7 @@ export default function App() {
       await api.delete(deleteTarget.email);
       setDelTarget(null);
       await loadUsers();
-      showToast("Usuário excluído.", "success");
+      showToast("Usuário excluído.");
     } catch {
       showToast("Erro ao excluir usuário.", "error");
     } finally {
@@ -485,16 +416,21 @@ export default function App() {
     }
   };
 
-  const filtered = users.filter(u =>
-    (u.nome?.toLowerCase() || "").includes(search.toLowerCase()) ||
-    (u.email?.toLowerCase() || "").includes(search.toLowerCase())
-  );
+  const [filtered, setFiltered] = useState([]);
+  // Busca no BACKEND - filtra por nome ou email (ajuda com performance em grandes bases)
+  useEffect(() => {
+    if (search.trim() === "") {
+      setFiltered(users);
+      return;
+    }
+    api.search(search).then(data => setFiltered(data || []));
+  }, [search, users]);
 
   return (
     <>
       <style>{globalStyles}</style>
 
-      {/* Background grid */}
+      {/* Fundo — grade */}
       <div style={{
         position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
         backgroundImage: `linear-gradient(${theme.border} 1px, transparent 1px), linear-gradient(90deg, ${theme.border} 1px, transparent 1px)`,
@@ -502,93 +438,145 @@ export default function App() {
         opacity: 0.25,
       }} />
 
-      {/* Accent glow */}
+      {/* Fundo — brilho roxo */}
       <div style={{
         position: "fixed", top: -200, left: "50%", transform: "translateX(-50%)",
-        width: 700, height: 400,
+        width: "min(700px, 100vw)", height: 400,
         background: `radial-gradient(ellipse at center, ${theme.accentGlow} 0%, transparent 70%)`,
         zIndex: 0, pointerEvents: "none",
       }} />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 780, margin: "0 auto", padding: "48px 24px" }}>
+      {/* Wrapper centralizado e responsivo */}
+      <div style={{
+        position: "relative",
+        zIndex: 1,
+        maxWidth: 820,
+        width: "100%",
+        margin: "0 auto",
+        padding: isMobile ? "28px 16px" : isTablet ? "40px 24px" : "56px 32px",
+        boxSizing: "border-box",
+      }}>
 
-        {/* Header */}
-        <div className="fade-in" style={{ marginBottom: 40 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+        {/* ── Cabeçalho ── */}
+        <div className="fade-in" style={{ marginBottom: isMobile ? 28 : 40 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div style={{
               width: 8, height: 8, borderRadius: "50%",
-              background: theme.accent,
-              animation: "pulse 2s infinite",
+              background: theme.accent, animation: "pulse 2s infinite", flexShrink: 0,
             }} />
-            <span style={{ fontSize: 11, color: theme.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>
+            <span style={{
+              fontSize: 11, color: theme.accent,
+              textTransform: "uppercase", letterSpacing: "0.15em",
+              fontWeight: 700, fontFamily: "'DM Mono', monospace",
+            }}>
               API · localhost:8080
             </span>
           </div>
-          <h1 style={{ fontSize: 38, fontWeight: 800, color: theme.text, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 6 }}>
-            Gerenciamento<br />
+
+          <h1 style={{
+            fontSize: isMobile ? 26 : isTablet ? 34 : 42,
+            fontWeight: 800, color: theme.text,
+            letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 8,
+          }}>
+            Gerenciamento{!isMobile && <br />}{" "}
             <span style={{ color: theme.accent }}>de Usuários</span>
           </h1>
-          <p style={{ color: theme.textMuted, fontSize: 14 }}>
+
+          <p style={{ color: theme.textMuted, fontSize: isMobile ? 13 : 14 }}>
             CRUD integrado com Spring Boot REST API
           </p>
         </div>
 
-        {/* Toolbar */}
+        {/* ── Barra de busca e ações ── */}
         <div className="fade-in" style={{
-          display: "flex", gap: 12, alignItems: "center",
-          marginBottom: 24,
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          gap: 10,
+          alignItems: "stretch",
+          marginBottom: 20,
           animationDelay: "0.1s",
         }}>
+          {/* Busca */}
           <div style={{ flex: 1, position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: theme.textMuted, fontSize: 14 }}>🔍</span>
+            <span style={{
+              position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
+              color: theme.textMuted, fontSize: 14, pointerEvents: "none",
+            }}>🔍</span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar por nome ou e-mail…"
               style={{
-                width: "100%", padding: "10px 14px 10px 40px",
-                background: theme.surface,
-                border: `1px solid ${theme.border}`,
+                width: "100%", padding: "11px 14px 11px 40px",
+                background: theme.surface, border: `1px solid ${theme.border}`,
                 borderRadius: 10, color: theme.text,
                 outline: "none", transition: "border-color 0.18s",
               }}
               onFocus={e => { e.currentTarget.style.borderColor = theme.accent; }}
-              onBlur={e => { e.currentTarget.style.borderColor = theme.border; }}
+              onBlur={e =>  { e.currentTarget.style.borderColor = theme.border; }}
             />
           </div>
-          <Button variant="ghost" onClick={loadUsers} loading={loading}>↻</Button>
-          <Button variant="primary" onClick={() => setModal({ type: "create" })}>
-            + Novo usuário
-          </Button>
+
+          {/* Botões */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={loadUsers}
+              disabled={loading}
+              title="Atualizar lista"
+              style={{
+                padding: "11px 14px", background: "transparent",
+                border: `1px solid ${theme.border}`, borderRadius: 8,
+                color: theme.textDim, cursor: "pointer", fontSize: 18, lineHeight: 1,
+              }}
+            >
+              {loading ? <Spinner /> : "↻"}
+            </button>
+
+            <button
+              onClick={() => setModal({ type: "create" })}
+              style={{
+                flex: 1,
+                padding: "11px 20px",
+                background: theme.accent, border: "none", borderRadius: 8,
+                color: "#fff", cursor: "pointer",
+                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13,
+                whiteSpace: "nowrap",
+              }}
+            >
+              + Novo usuário
+            </button>
+          </div>
         </div>
 
-        {/* Stats bar */}
-        <div className="fade-in" style={{
-          display: "flex", gap: 2, alignItems: "center",
-          marginBottom: 16, animationDelay: "0.15s",
-        }}>
+        {/* ── Contador ── */}
+        <div className="fade-in" style={{ display: "flex", alignItems: "center", marginBottom: 14, animationDelay: "0.15s" }}>
           <span style={{ fontSize: 12, color: theme.textMuted }}>
             {loading ? "Carregando…" : `${filtered.length} usuário${filtered.length !== 1 ? "s" : ""}`}
           </span>
-          {search && <span style={{ fontSize: 12, color: theme.accent, marginLeft: 4 }}>(filtrado de {users.length})</span>}
+          {search && (
+            <span style={{ fontSize: 12, color: theme.accent, marginLeft: 6 }}>
+              (filtrado de {users.length})
+            </span>
+          )}
         </div>
 
-        {/* Error state */}
+        {/* ── Erro de conexão ── */}
         {fetchError && (
           <div className="fade-in" style={{
-            background: "rgba(239,68,68,0.08)",
-            border: `1px solid ${theme.danger}`,
-            borderRadius: 12, padding: "20px 24px",
-            marginBottom: 20,
+            background: "rgba(239,68,68,0.08)", border: `1px solid ${theme.danger}`,
+            borderRadius: 12, padding: isMobile ? "14px 16px" : "20px 24px", marginBottom: 20,
           }}>
-            <p style={{ fontWeight: 700, color: theme.danger, marginBottom: 4 }}>Não foi possível conectar à API</p>
-            <p style={{ fontSize: 13, color: theme.textMuted }}>
-              Certifique-se de que o backend está rodando em <code style={{ color: theme.accent }}>http://localhost:8080</code> e que o CORS está habilitado.
+            <p style={{ fontWeight: 700, color: theme.danger, marginBottom: 4 }}>
+              Não foi possível conectar à API
+            </p>
+            <p style={{ fontSize: 13, color: theme.textMuted, lineHeight: 1.6 }}>
+              Certifique-se de que o backend está rodando em{" "}
+              <code style={{ color: theme.accent }}>http://localhost:8080</code> e que o CORS está habilitado.
             </p>
           </div>
         )}
 
-        {/* User list */}
+        {/* ── Lista de usuários ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {loading && users.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: theme.textMuted }}>
@@ -597,10 +585,9 @@ export default function App() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="fade-in" style={{
-              textAlign: "center", padding: "60px 0",
+              textAlign: "center", padding: isMobile ? "40px 16px" : "60px 0",
               color: theme.textMuted, fontSize: 14,
-              border: `1px dashed ${theme.border}`,
-              borderRadius: 12,
+              border: `1px dashed ${theme.border}`, borderRadius: 12,
             }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>👤</div>
               {search ? "Nenhum usuário encontrado para essa busca." : "Nenhum usuário cadastrado ainda."}
@@ -608,36 +595,45 @@ export default function App() {
           ) : (
             filtered.map((u, i) => (
               <UserRow
-                key={u.id}
+                key={u.Id ?? u.id}
                 user={u}
                 index={i}
-                onEdit={u => setModal({ type: "edit", user: u })}
+                isMobile={isMobile}
+                onEdit={u  => setModal({ type: "edit", user: u })}
                 onDelete={u => setDelTarget(u)}
               />
             ))
           )}
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: 48, paddingTop: 24, borderTop: `1px solid ${theme.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* ── Rodapé ── */}
+        <div style={{
+          marginTop: 48, paddingTop: 24,
+          borderTop: `1px solid ${theme.border}`,
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          justifyContent: "space-between",
+          alignItems: isMobile ? "flex-start" : "center",
+          gap: 12,
+        }}>
           <span style={{ fontSize: 11, color: theme.textMuted, fontFamily: "'DM Mono', monospace" }}>
             by Kaio Lamanna
           </span>
-          <div style={{ display: "flex", gap: 16 }}>
-            {["POST /usuarios", "GET /usuarios", "PUT /{id}", "DELETE /{id}"].map(ep => (
-              <span key={ep} style={{ fontSize: 10, color: theme.textMuted, fontFamily: "'DM Mono', monospace" }}>{ep}</span>
-            ))}
-          </div>
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              {["POST /usuario", "GET /lista", "PUT /usuario", "DELETE /?email"].map(ep => (
+                <span key={ep} style={{ fontSize: 10, color: theme.textMuted, fontFamily: "'DM Mono', monospace" }}>
+                  {ep}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Modals */}
+      {/* ── Modais ── */}
       {modal && (
-        <UserModal
-          user={modal.user}
-          onClose={() => setModal(null)}
-          onSave={handleSave}
-        />
+        <UserModal user={modal.user} onClose={() => setModal(null)} onSave={handleSave} />
       )}
       {deleteTarget && (
         <DeleteConfirm
@@ -647,12 +643,10 @@ export default function App() {
           loading={deleteLoading}
         />
       )}
+
+      {/* ── Toast ── */}
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onDone={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onDone={() => setToast(null)} />
       )}
     </>
   );
