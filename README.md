@@ -24,7 +24,7 @@ Foi desenvolvida com o objetivo de praticar:
 ## 🛠 Tecnologias utilizadas
 
 ### Backend
-* Java 25
+* Java 17
 * Spring Boot 3
 * Spring Data JPA
 * H2 Database (em memória)
