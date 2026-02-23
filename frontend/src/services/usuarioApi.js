@@ -1,4 +1,4 @@
-const API_BASE = "http://cadastro-de-usuario.railway.internal";
+const API_BASE = "http://backend-cadastro-production.up.railway.app";
 
 async function apiFetch(url, options = {}) {
   const res = await fetch(url, {
