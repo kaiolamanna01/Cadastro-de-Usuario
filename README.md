@@ -176,6 +176,13 @@ cadastrar_usuario/
 
 ---
 
+## 🚀 Deploy
+
+O projeto está disponível em produção:
+
+- **Frontend:** https://frontend-cadastro-production.up.railway.app
+- **Backend:** https://backend-cadastro-production.up.railway.app
+
 ## 🎯 Objetivo do projeto
 
 Projeto desenvolvido para fins **acadêmicos e de portfólio**, com o objetivo de demonstrar conhecimentos em:
