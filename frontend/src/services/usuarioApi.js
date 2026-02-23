@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/usuario";
+const API_BASE = "http://cadastro-de-usuario.railway.internal";
 
 async function apiFetch(url, options = {}) {
   const res = await fetch(url, {
