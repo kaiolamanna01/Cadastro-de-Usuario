@@ -6,8 +6,8 @@ import Toast from "./components/Toast";
 import UserRow from "./components/UserRow";
 import UserModal from "./components/UserModal";
 import DeleteConfirm from "./components/DeleteConfirm";
+import LoginPage from "./LoginPage";
 
-// Hook para detectar largura da tela
 function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
@@ -19,6 +19,19 @@ function useWindowWidth() {
 }
 
 export default function App() {
+  const [authenticated, setAuthenticated] = useState(!!localStorage.getItem("token"));
+
+  if (!authenticated) {
+    return <LoginPage onLogin={() => setAuthenticated(true)} />;
+  }
+
+  return <Dashboard onLogout={() => {
+    localStorage.removeItem("token");
+    setAuthenticated(false);
+  }} />;
+}
+
+function Dashboard({ onLogout }) {
   const [users, setUsers]            = useState([]);
   const [loading, setLoading]        = useState(false);
   const [search, setSearch]          = useState("");
@@ -70,7 +83,6 @@ export default function App() {
   };
 
   const [filtered, setFiltered] = useState([]);
-  // Busca no BACKEND - filtra por nome ou email (ajuda com performance em grandes bases)
   useEffect(() => {
     if (search.trim() === "") {
       setFiltered(users);
@@ -101,10 +113,7 @@ export default function App() {
 
       {/* Wrapper centralizado e responsivo */}
       <div style={{
-        position: "relative",
-        zIndex: 1,
-        maxWidth: 820,
-        width: "100%",
+        position: "relative", zIndex: 1, maxWidth: 820, width: "100%",
         margin: "0 auto",
         padding: isMobile ? "28px 16px" : isTablet ? "40px 24px" : "56px 32px",
         boxSizing: "border-box",
@@ -112,18 +121,42 @@ export default function App() {
 
         {/* ── Cabeçalho ── */}
         <div className="fade-in" style={{ marginBottom: isMobile ? 28 : 40 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div style={{
-              width: 8, height: 8, borderRadius: "50%",
-              background: theme.accent, animation: "pulse 2s infinite", flexShrink: 0,
-            }} />
-            <span style={{
-              fontSize: 11, color: theme.accent,
-              textTransform: "uppercase", letterSpacing: "0.15em",
-              fontWeight: 700, fontFamily: "'DM Mono', monospace",
-            }}>
-              API · localhost:8080
-            </span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 8, height: 8, borderRadius: "50%",
+                background: theme.accent, animation: "pulse 2s infinite", flexShrink: 0,
+              }} />
+              <span style={{
+                fontSize: 11, color: theme.accent,
+                textTransform: "uppercase", letterSpacing: "0.15em",
+                fontWeight: 700, fontFamily: "'DM Mono', monospace",
+              }}>
+                API · Railway
+              </span>
+            </div>
+
+            {/* Botão de logout */}
+            <button
+              onClick={onLogout}
+              style={{
+                padding: "7px 16px", background: "transparent",
+                border: `1px solid ${theme.border}`, borderRadius: 8,
+                color: theme.textMuted, cursor: "pointer", fontSize: 12,
+                fontFamily: "'DM Mono', monospace",
+                transition: "border-color 0.18s, color 0.18s",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = theme.danger;
+                e.currentTarget.style.color = theme.danger;
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = theme.border;
+                e.currentTarget.style.color = theme.textMuted;
+              }}
+            >
+              Sair
+            </button>
           </div>
 
           <h1 style={{
@@ -142,14 +175,9 @@ export default function App() {
 
         {/* ── Barra de busca e ações ── */}
         <div className="fade-in" style={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          gap: 10,
-          alignItems: "stretch",
-          marginBottom: 20,
-          animationDelay: "0.1s",
+          display: "flex", flexDirection: isMobile ? "column" : "row",
+          gap: 10, alignItems: "stretch", marginBottom: 20, animationDelay: "0.1s",
         }}>
-          {/* Busca */}
           <div style={{ flex: 1, position: "relative" }}>
             <span style={{
               position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
@@ -170,7 +198,6 @@ export default function App() {
             />
           </div>
 
-          {/* Botões */}
           <div style={{ display: "flex", gap: 8 }}>
             <button
               onClick={loadUsers}
@@ -188,8 +215,7 @@ export default function App() {
             <button
               onClick={() => setModal({ type: "create" })}
               style={{
-                flex: 1,
-                padding: "11px 20px",
+                flex: 1, padding: "11px 20px",
                 background: theme.accent, border: "none", borderRadius: 8,
                 color: "#fff", cursor: "pointer",
                 fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13,
@@ -223,8 +249,7 @@ export default function App() {
               Não foi possível conectar à API
             </p>
             <p style={{ fontSize: 13, color: theme.textMuted, lineHeight: 1.6 }}>
-              Certifique-se de que o backend está rodando em{" "}
-              <code style={{ color: theme.accent }}>http://localhost:8080</code> e que o CORS está habilitado.
+              Certifique-se de que o backend está rodando e que o CORS está habilitado.
             </p>
           </div>
         )}
