@@ -1,5 +1,5 @@
 package com.kaiolamanna.cadastrar_usuario.infrastructure.config;
-
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,9 +47,10 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("https://frontend-cadastro-production.up.railway.app"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsMapping("/**", config);
+        source.setCorsConfigurations(Map.of("/**", config));
         return source;
 }
 }
