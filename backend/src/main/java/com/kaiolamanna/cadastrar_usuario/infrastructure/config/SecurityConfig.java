@@ -50,7 +50,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.setCorsConfigurations(Map.of("/**", config));
+        source.registerCorsConfiguration("/**", config);
         return source;
-}
+    }
 }
