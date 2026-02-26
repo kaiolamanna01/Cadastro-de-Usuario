@@ -4,7 +4,7 @@ import {
   criarUsuario,
   deletarUsuario,
   atualizarUsuario,
-} from "../../services/api";
+} from "../../services/usuarioApi";
 
 function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
