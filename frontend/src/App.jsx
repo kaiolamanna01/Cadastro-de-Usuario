@@ -189,27 +189,6 @@ function Dashboard() {
             </div>
 
             <div style={{ display: "flex", gap: 8 }}>
-              {/* Botão para ir ao cadastro */}
-              <button
-                onClick={() => navigate("/cadastro")}
-                style={{
-                  padding: "7px 16px", background: "transparent",
-                  border: `1px solid ${theme.border}`, borderRadius: 8,
-                  color: theme.textMuted, cursor: "pointer", fontSize: 12,
-                  fontFamily: "'DM Mono', monospace",
-                  transition: "border-color 0.18s, color 0.18s",
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = theme.accent;
-                  e.currentTarget.style.color = theme.accent;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = theme.border;
-                  e.currentTarget.style.color = theme.textMuted;
-                }}
-              >
-                Cadastro
-              </button>
 
               {/* Botão de logout */}
               <button
