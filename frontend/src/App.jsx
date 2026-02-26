@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { globalStyles, theme } from "./styles/global";
 import { api } from "./services/usuarioApi";
 import Spinner from "./components/Spinner";
@@ -6,7 +7,8 @@ import Toast from "./components/Toast";
 import UserRow from "./components/UserRow";
 import UserModal from "./components/UserModal";
 import DeleteConfirm from "./components/DeleteConfirm";
-import LoginPage from "./LoginPage";
+import LoginPage from "./pages/LoginPage";
+import Usuarios from "./pages/Usuarios";
 
 function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);
@@ -18,20 +20,65 @@ function useWindowWidth() {
   return width;
 }
 
-export default function App() {
-  const [authenticated, setAuthenticated] = useState(!!localStorage.getItem("token"));
-
-  if (!authenticated) {
-    return <LoginPage onLogin={() => setAuthenticated(true)} />;
-  }
-
-  return <Dashboard onLogout={() => {
-    localStorage.removeItem("token");
-    setAuthenticated(false);
-  }} />;
+// Rota protegida — redireciona para /login se não autenticado
+function PrivateRoute({ children }) {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" replace />;
 }
 
-function Dashboard({ onLogout }) {
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Rota pública */}
+        <Route path="/login" element={<LoginWrapper />} />
+
+        {/* Rota protegida — dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Rota protegida — cadastro */}
+        <Route
+          path="/cadastro"
+          element={
+            <PrivateRoute>
+              <Usuarios />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Redireciona a raiz para /login ou /dashboard dependendo do token */}
+        <Route
+          path="*"
+          element={
+            localStorage.getItem("token")
+              ? <Navigate to="/dashboard" replace />
+              : <Navigate to="/login" replace />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function LoginWrapper() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  // Se já estiver logado, redireciona direto para o dashboard
+  if (token) return <Navigate to="/dashboard" replace />;
+
+  return <LoginPage onLogin={() => navigate("/dashboard")} />;
+}
+
+function Dashboard() {
+  const navigate = useNavigate();
   const [users, setUsers]            = useState([]);
   const [loading, setLoading]        = useState(false);
   const [search, setSearch]          = useState("");
@@ -46,6 +93,11 @@ function Dashboard({ onLogout }) {
   const isTablet = width < 900;
 
   const showToast = (message, type = "success") => setToast({ message, type });
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -136,27 +188,51 @@ function Dashboard({ onLogout }) {
               </span>
             </div>
 
-            {/* Botão de logout */}
-            <button
-              onClick={onLogout}
-              style={{
-                padding: "7px 16px", background: "transparent",
-                border: `1px solid ${theme.border}`, borderRadius: 8,
-                color: theme.textMuted, cursor: "pointer", fontSize: 12,
-                fontFamily: "'DM Mono', monospace",
-                transition: "border-color 0.18s, color 0.18s",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = theme.danger;
-                e.currentTarget.style.color = theme.danger;
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = theme.border;
-                e.currentTarget.style.color = theme.textMuted;
-              }}
-            >
-              Sair
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              {/* Botão para ir ao cadastro */}
+              <button
+                onClick={() => navigate("/cadastro")}
+                style={{
+                  padding: "7px 16px", background: "transparent",
+                  border: `1px solid ${theme.border}`, borderRadius: 8,
+                  color: theme.textMuted, cursor: "pointer", fontSize: 12,
+                  fontFamily: "'DM Mono', monospace",
+                  transition: "border-color 0.18s, color 0.18s",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = theme.accent;
+                  e.currentTarget.style.color = theme.accent;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = theme.border;
+                  e.currentTarget.style.color = theme.textMuted;
+                }}
+              >
+                Cadastro
+              </button>
+
+              {/* Botão de logout */}
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "7px 16px", background: "transparent",
+                  border: `1px solid ${theme.border}`, borderRadius: 8,
+                  color: theme.textMuted, cursor: "pointer", fontSize: 12,
+                  fontFamily: "'DM Mono', monospace",
+                  transition: "border-color 0.18s, color 0.18s",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = theme.danger;
+                  e.currentTarget.style.color = theme.danger;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = theme.border;
+                  e.currentTarget.style.color = theme.textMuted;
+                }}
+              >
+                Sair
+              </button>
+            </div>
           </div>
 
           <h1 style={{
