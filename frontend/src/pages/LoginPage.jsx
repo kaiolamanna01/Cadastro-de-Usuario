@@ -40,10 +40,9 @@ export default function LoginPage({ onLogin }) {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         .login-root {
           min-height: 100vh;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -51,6 +50,8 @@ export default function LoginPage({ onLogin }) {
           font-family: 'DM Mono', monospace;
           position: relative;
           overflow: hidden;
+          padding: 16px;
+          box-sizing: border-box;
         }
 
         .login-grid {
@@ -61,6 +62,7 @@ export default function LoginPage({ onLogin }) {
             linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 48px 48px;
           pointer-events: none;
+          z-index: 0;
         }
 
         .login-glow {
@@ -72,6 +74,7 @@ export default function LoginPage({ onLogin }) {
           height: 400px;
           background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
           pointer-events: none;
+          z-index: 0;
         }
 
         .login-card {
@@ -84,10 +87,11 @@ export default function LoginPage({ onLogin }) {
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 16px;
           backdrop-filter: blur(12px);
-          animation: fadeUp 0.5s ease both;
+          animation: loginFadeUp 0.5s ease both;
+          box-sizing: border-box;
         }
 
-        @keyframes fadeUp {
+        @keyframes loginFadeUp {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
         }
@@ -102,12 +106,13 @@ export default function LoginPage({ onLogin }) {
         .login-dot {
           width: 8px;
           height: 8px;
+          flex-shrink: 0;
           border-radius: 50%;
           background: #7c3aed;
-          animation: pulse 2s infinite;
+          animation: loginPulse 2s infinite;
         }
 
-        @keyframes pulse {
+        @keyframes loginPulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
         }
@@ -162,6 +167,7 @@ export default function LoginPage({ onLogin }) {
           outline: none;
           transition: border-color 0.18s, background 0.18s;
           margin-bottom: 16px;
+          box-sizing: border-box;
         }
 
         .login-input:focus {
@@ -181,7 +187,7 @@ export default function LoginPage({ onLogin }) {
           font-size: 12px;
           color: #ef4444;
           margin-bottom: 16px;
-          animation: fadeUp 0.2s ease both;
+          animation: loginFadeUp 0.2s ease both;
         }
 
         .login-btn {
@@ -197,10 +203,12 @@ export default function LoginPage({ onLogin }) {
           cursor: pointer;
           transition: background 0.18s, transform 0.1s;
           margin-top: 4px;
+          box-sizing: border-box;
         }
 
         .login-btn:hover:not(:disabled) {
           background: #6d28d9;
+          border-color: transparent;
         }
 
         .login-btn:active:not(:disabled) {
@@ -219,6 +227,32 @@ export default function LoginPage({ onLogin }) {
           text-align: center;
           font-size: 11px;
           color: rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 480px) {
+          .login-card {
+            padding: 28px 20px;
+            border-radius: 12px;
+          }
+
+          .login-title {
+            font-size: 22px;
+          }
+
+          .login-subtitle {
+            font-size: 11px;
+            margin-bottom: 24px;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .login-card {
+            padding: 24px 16px;
+          }
+
+          .login-title {
+            font-size: 20px;
+          }
         }
       `}</style>
 
