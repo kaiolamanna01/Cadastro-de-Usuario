@@ -1,4 +1,4 @@
-const API_BASE = "https://backend-cadastro-production.up.railway.app/usuario";
+const API_BASE = "https://backend-cadastro-production.up.railway.app";
 
 function getToken() {
   return localStorage.getItem("token");
