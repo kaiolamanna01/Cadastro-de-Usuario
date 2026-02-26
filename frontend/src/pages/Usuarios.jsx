@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
-import {
-  listarUsuarios,
-  criarUsuario,
-  deletarUsuario,
-  atualizarUsuario,
-} from "../../services/usuarioApi";
+import { api } from "../../services/usuarioApi";
 
 function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [nome, setNome] = useState("");
   const [editandoId, setEditandoId] = useState(null);
 
-  // Carrega usuários ao iniciar
   useEffect(() => {
     carregarUsuarios();
   }, []);
 
   async function carregarUsuarios() {
     try {
-      const dados = await listarUsuarios();
-      setUsuarios(dados);
+      const dados = await api.list();
+      setUsuarios(dados || []);
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
     }
@@ -27,15 +21,13 @@ function Usuarios() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     try {
       if (editandoId) {
-        await atualizarUsuario(editandoId, { nome });
+        await api.update(editandoId, { nome });
         setEditandoId(null);
       } else {
-        await criarUsuario({ nome });
+        await api.create({ nome });
       }
-
       setNome("");
       carregarUsuarios();
     } catch (error) {
@@ -45,7 +37,7 @@ function Usuarios() {
 
   async function handleDelete(id) {
     try {
-      await deletarUsuario(id);
+      await api.delete(id);
       carregarUsuarios();
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
@@ -60,7 +52,6 @@ function Usuarios() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Cadastro de Usuários</h2>
-
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -73,19 +64,13 @@ function Usuarios() {
           {editandoId ? "Atualizar" : "Cadastrar"}
         </button>
       </form>
-
       <hr />
-
       <ul>
         {usuarios.map((usuario) => (
           <li key={usuario.id}>
             {usuario.nome}{" "}
-            <button onClick={() => handleEdit(usuario)}>
-              Editar
-            </button>
-            <button onClick={() => handleDelete(usuario.id)}>
-              Deletar
-            </button>
+            <button onClick={() => handleEdit(usuario)}>Editar</button>
+            <button onClick={() => handleDelete(usuario.id)}>Deletar</button>
           </li>
         ))}
       </ul>
